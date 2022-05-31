@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 40%;
+            width: 100%;
+            font-size: 5vh;
+            background-color: yellowgreen;
+        }
+
+        #sentFiles {
+            position: absolute;
+            top: 40%;
+            left: 0;
+            height: 60%;
+            width: 100%;
+            font-size: 3vh;
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box"> Przenieś pliki tutaj</div>
+    <div id="sentFiles"></div>
+    <script>
+        let box = document.getElementById("box")
+        let list = document.getElementById("sentFiles")
+        document.querySelector("#box").ondragenter = function (e) {
+            box.style.background = "lightblue"
+            box.textContent = "Upuść Plik"
+            console.log("drag enter na divie")
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+
+        document.querySelector("#box").ondragover = function (e) {
+
+            console.log("drag over na divie")
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+        document.querySelector("#box").ondragleave = function (e) {
+            box.style.background = "yellowgreen"
+            box.textContent = "Przenieś pliki tutaj"
+            console.log("dragleave na divie")
+            e.stopPropagation();
+            e.preventDefault();
+
+        }
+        document.querySelector("#box").ondrop = function (e) {
+            box.style.background = "yellowgreen"
+            box.textContent = "Przenieś pliki tutaj"
+            list.innerHTML = ""
+            console.log("drop na divie")
+            e.stopPropagation();
+            e.preventDefault();
+
+            var files = Array.from(e.dataTransfer.files);
+            console.log(files.length)
+
+            files.forEach(element => {
+                list.innerHTML += (`${element.name} <br>`)
+
+            })
+
+            var formData = new FormData();
+            files.forEach(element => {
+                list.innerHTML += (`${element.name} <br>`)
+
+                if (element.type == "image/jpeg" || element.type == "image/png") {
+                    formData.append('cover', element)
+                }
+                else if (element.type == 'audio/mpeg') {
+                    formData.append('songs', element)
+                }
+            })
+            console.log(formData)
+            fetch("http://localhost:3000/addSongToFiles", {
+                method: "POST",
+                mode: "no-cors",
+                body: formData
+            }).catch((err) => console.log(err));
+
+            console.log(files)
+
+            // teraz utwórz obiekt FormData zastępujący formularz - patrz poprzednie lekcje z uploadem
+            // oraz dodaj do niego po kolei wszystkie pliki z powyższej listy files
+            // na koniec użyj dowolnej technologii do uploadu pliku/ów - patrz poprzednie lekcje
+
+        }
+    </script>
+</body>
+
+</html>
